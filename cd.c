@@ -13,19 +13,25 @@ struct utsname UName;
 // extern char **tokens;
 // extern char *token_pointers;
 
-void chck(char *check_for){
+void chck(int chk){
 // Checks if (check_for) parameter has been allocated memory correctly
-    if(check_for){
+    if(chk == -1){
         perror("Error changing directory");
     }
 }
 
 void cd(char* parsed_line[], int number_of_arguments ){
+
+    // Input = cd (ONLY)
+    if(number_of_arguments == 1){
+        return;
+    }
     
     // HOME dir
     if(strcmp(parsed_line[1], "~") == 0 || number_of_arguments < 2){
         int chk = chdir(HOME_DIR);
         chck(chk);
+        return;
 
     }
     // Current dir
@@ -46,7 +52,7 @@ void cd(char* parsed_line[], int number_of_arguments ){
         strcpy(new_dir, parsed_line[1]);
     }
 
-    // If relative path is given
+    // If absolute path is given
     else if(parsed_line[1][0] == "/"){
         strcpy(new_dir, parsed_line[1]);
     }
@@ -61,5 +67,6 @@ void cd(char* parsed_line[], int number_of_arguments ){
     // Check if valid
     int chk = chdir(new_dir);
     chck(chk);
+    return;
 
 }

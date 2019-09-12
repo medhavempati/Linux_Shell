@@ -1,11 +1,14 @@
 #include "libraries.h"
 
+//--------------------GLOBAL VARIABLES/CONSTANTS--------------------------
+
 char HOME_DIR[1000000];
 char* CUR_USER;
 char* CUR_SYSTEM;
 char ABS_PATH[1000000];
 char PATH_NAME[100000] = "~";
 DIR *PATH_CHECK;
+int newline = 0;
 
 struct utsname UName;
 
@@ -13,15 +16,24 @@ int number_of_arguments;
 char **tokens;
 char *token_pointers;
 
+#define DELIMITERS " \t\r\n\a"
+#define BUFFER_SIZE 128
+
+//----------------------CLEAR SCREEN FUNCTION-------------------------
+
 void clear_screen()
 {
   const char *CLEAR_SCREEN = "\e[1;1H\e[2J";
   write(1, CLEAR_SCREEN, 11);
 }
 
+//------------------FUNCTION TO PRINT SHELL PROMPT--------------------
+
 void print_prompt(){
 
 }
+
+//---------------------FUNCTION TO READ INPUT------------------------
 
 char *read_input(void){
     // Allocate size to buffer
@@ -36,8 +48,7 @@ char *read_input(void){
     return input_line;
 }
 
-#define DELIMITERS " \t\r\n\a"
-#define BUFFER_SIZE 128
+//---------------------FUNCTION TO PARSE INPUT------------------------
 
 void check_validity_parse(char *check_for){
 // Checks if (check_for) parameter has been allocated memory correctly
@@ -76,9 +87,16 @@ char **parse_line(char *input){
 
         token_pointers = strtok(NULL, DELIMITERS);
     }
-    tokens[number_of_arguments] = NULL;
+    if(number_of_arguments == 0){
+        tokens[0] = &newline;
+    }
+    else{
+        tokens[number_of_arguments] = NULL;
+    }
     return tokens;
 }
+
+//---------------FUNCTION TO CHECK VALIDITY OF SYSCALL----------------
 
 void validity(char* valid){
     if(valid == NULL){
@@ -86,6 +104,8 @@ void validity(char* valid){
         exit(1);
     }
 }
+
+//------------------------------MAIN----------------------------------
 
 int main(){
 
@@ -191,7 +211,12 @@ int main(){
         // Execute
 
         // Check first token (command)
-        if(strcmp(parsed_line[0], "cd") == 0){
+        if(parsed_line[0] == &newline){
+        }
+        else if(!strcmp(parsed_line[0], "clear")){
+            clear_screen();
+        }
+        else if(strcmp(parsed_line[0], "cd") == 0){
             cd(parsed_line, number_of_arguments);
         }
         else if(strcmp(parsed_line[0], "pwd") == 0){
